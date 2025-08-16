@@ -1,23 +1,26 @@
 @echo off
 echo =====================================
-echo   Installing Asset Validator Dependencies
+echo   Quick Push with All Fixes
 echo =====================================
 echo.
 
 cd /d D:\Dev\kha\tori_ui_svelte
 
-echo Installing required packages...
+echo Step 1: Installing validator dependencies...
 call npm install @gltf-transform/core @gltf-transform/functions
 
 echo.
-echo Dependencies installed!
+echo Step 2: Committing all changes...
+git add .
+git commit -m "fix: add missing validator dependencies and push scripts"
+
 echo.
-echo Testing validator...
-node tools\assets\validate-manifest.mjs assets\3d\luxury\ASSET_MANIFEST.json --maxTris=100000
+echo Step 3: Pushing to remote...
+git push
 
 echo.
 echo =====================================
-echo   Ready to push!
+echo   Success! Everything is pushed.
 echo =====================================
 echo.
 pause

@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+#!/usr/bin/env powershell
 # Quick verification script for iRis setup
 param([switch]$SkipAssets)
 
