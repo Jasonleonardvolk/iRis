@@ -1,6 +1,6 @@
 ﻿{
     "name":  "iris",
-    "version":  "0.0.1",
+    "version":  "0.1.0",
     "private":  true,
     "scripts":  {
                     "clean:svelte":  "rimraf .svelte-kit",
@@ -12,7 +12,8 @@
                     "backend":  "python ../enhanced_launcher.py",
                     "sync":  "svelte-kit sync",
                     "check":  "svelte-check",
-                    "start:prod":  "node build/index.js"
+                    "start:prod":  "node build/index.js",
+                    "validate:assets":  "node tools/assets/validate-manifest.mjs assets/3d/luxury/ASSET_MANIFEST.json --maxTris=100000 --maxTexDim=4096 --maxTexBytes=16777216 --maxAlphaDim=2048 --maxAlphaBytes=8388608 --maxSetBytes=52428800"
                 },
     "devDependencies":  {
                             "@playwright/test":  "^1.28.1",
