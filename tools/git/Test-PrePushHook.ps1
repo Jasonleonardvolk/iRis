@@ -12,7 +12,7 @@ Set-Location $projectDir
 
 # Test 1: Run verifier directly
 Write-Host "Test 1: Running verifier directly..." -ForegroundColor Yellow
-& pwsh -NoProfile -ExecutionPolicy Bypass -File ".\tools\release\verify-setup.ps1"
+& powershell -NoProfile -ExecutionPolicy Bypass -File ".\tools\release\verify-setup.ps1"
 $verifierExit = $LASTEXITCODE
 Write-Host "Verifier exit code: $verifierExit" -ForegroundColor Cyan
 
@@ -50,7 +50,7 @@ Write-Host ""
 # Test 3: Test with skip assets flag
 Write-Host "Test 3: Testing with IRIS_SKIP_ASSETS=1..." -ForegroundColor Yellow
 $env:IRIS_SKIP_ASSETS = "1"
-& pwsh -NoProfile -ExecutionPolicy Bypass -File ".\tools\release\verify-setup.ps1" -SkipAssets
+& powershell -NoProfile -ExecutionPolicy Bypass -File ".\tools\release\verify-setup.ps1" -SkipAssets
 $skipExit = $LASTEXITCODE
 $env:IRIS_SKIP_ASSETS = $null
 Write-Host "Skip assets exit code: $skipExit" -ForegroundColor Cyan
