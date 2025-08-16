@@ -9,6 +9,33 @@ param(
     [switch]$EnableLAN
 )
 
+# === PORT GUARD START ===
+# Ensures the target port is free before we start the server.
+$DefaultPort = 3000
+if (-not $env:PORT -or -not ($env:PORT -as [int])) { $env:PORT = $DefaultPort }
+[int]$__port = [int]$env:PORT
+
+$__tcp = Get-NetTCPConnection -LocalPort $__port -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($__tcp) {
+  $__pid  = $__tcp.OwningProcess
+  $__proc = Get-Process -Id $__pid -ErrorAction SilentlyContinue
+  $__path = $__proc?.Path
+  throw "Reset-And-Ship: Port $__port is already in use by PID $__pid ($__path). Stop it or set `$env:PORT to a free port, then retry."
+}
+
+function Wait-PortListening {
+  param([int]$Port, [int]$TimeoutSec = 20)
+  $sw = [System.Diagnostics.Stopwatch]::StartNew()
+  while ($sw.Elapsed.TotalSeconds -lt $TimeoutSec) {
+    $listening = Get-NetTCPConnection -LocalPort $Port -ErrorAction SilentlyContinue |
+                 Where-Object { $_.State -eq 'Listen' }
+    if ($listening) { return }
+    Start-Sleep -Milliseconds 250
+  }
+  throw "Server did not start listening on port $Port within $TimeoutSec seconds."
+}
+# === PORT GUARD END ===
+
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host "     iRis v0.1.0 - Reset & Ship Pipeline     " -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan

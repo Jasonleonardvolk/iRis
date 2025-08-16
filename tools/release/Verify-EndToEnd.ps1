@@ -9,6 +9,43 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# === BOM LINTER START ===
+# Fails (or auto-fixes) if UTF-8 BOM is present in JSON-like files.
+# Opt-in auto-fix: set IRIS_AUTOFIX_BOM=1 environment variable.
+
+$uiRoot   = (Resolve-Path "$PSScriptRoot\..\..").Path
+$patterns = @("*.json", "*.jsonc", "tsconfig*.json")
+$exclude  = @("\node_modules\", "\build\", "\.svelte-kit\", "\dist\", "\.vercel\", "\var\uploads\")
+
+$bad = New-Object System.Collections.Generic.List[string]
+Get-ChildItem -Path $uiRoot -Recurse -File -Include $patterns | Where-Object {
+  $full = $_.FullName
+  foreach ($ex in $exclude) { if ($full -like "*$ex*") { return $false } }
+  return $true
+} | ForEach-Object {
+  $bytes = [System.IO.File]::ReadAllBytes($_.FullName)
+  if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
+    if ($env:IRIS_AUTOFIX_BOM -eq "1") {
+      $trim = $bytes[3..($bytes.Length-1)]
+      $text = [System.Text.Encoding]::UTF8.GetString($trim)
+      $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+      [System.IO.File]::WriteAllText($_.FullName, $text, $utf8NoBom)
+    } else {
+      $bad.Add($_.FullName) | Out-Null
+    }
+  }
+}
+
+if ($bad.Count -gt 0 -and $env:IRIS_AUTOFIX_BOM -ne "1") {
+  Write-Error ("BOM found in:`n" + ($bad -join "`n") + "`nSet IRIS_AUTOFIX_BOM=1 to auto-fix or remove BOMs and rerun.")
+  exit 1
+} elseif ($bad.Count -gt 0) {
+  Write-Host ("[BOM Linter] Stripped BOM from:`n" + ($bad -join "`n"))
+} else {
+  Write-Host "[BOM Linter] No BOM detected."
+}
+# === BOM LINTER END ===
+
 # Color output helpers
 function Write-Success {
     param([string]$Message)
