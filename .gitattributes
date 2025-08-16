@@ -1,0 +1,16 @@
+* text=auto
+
+# Windows scripts (CRLF)
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+
+# POSIX scripts (LF)
+*.sh text eol=lf
+*.mjs text eol=lf
+
+# Code files (LF)
+*.ts  text eol=lf
+*.tsx text eol=lf
+*.svelte text eol=lf
+*.wgsl text eol=lf
+*.js  text eol=lf
